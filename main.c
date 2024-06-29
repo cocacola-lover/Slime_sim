@@ -1,9 +1,12 @@
 #include <stdio.h>
 #include <SDL2/SDL.h>
+#include "headers/agent_field.h"
 
 int main(void)
 {
-    printf("Hello World\n");
+
+    char **traceMap = mallocTraceMap(640, 480);
+    struct Agent *agentArray = mallocAgent();
 
     SDL_Window *window;     // Declare a window
     SDL_Renderer *renderer; // Declare a renderer
@@ -19,18 +22,34 @@ int main(void)
     );
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 
-    SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255);
+    for (int i = 0; i < 100; i++)
+    {
 
-    SDL_RenderClear(renderer);
+        iterateAgents(agentArray, 1, traceMap, 640, 480);
 
-    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
-    SDL_Rect rect = {220, 140, 200, 200};
-    SDL_RenderFillRect(renderer, &rect);
+        SDL_RenderClear(renderer);
 
-    SDL_RenderPresent(renderer);
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-    SDL_Delay(2000);
+        for (int j = 0; j < 640; j++)
+        {
+            for (int k = 0; k < 480; k++)
+            {
+                char alpha = traceMap[j][k];
+                SDL_SetRenderDrawColor(renderer, alpha, alpha, alpha, 255);
+                SDL_RenderDrawPoint(renderer, j, k);
+            }
+        }
+
+        SDL_RenderPresent(renderer);
+
+        SDL_Delay(1000);
+    }
+
+    freeTraceMap(traceMap, 640);
+    free(agentArray);
 
     // Close and destroy the window
     SDL_DestroyWindow(window);
@@ -38,7 +57,6 @@ int main(void)
 
     // Clean up
     SDL_Quit();
-    return 0;
 
     return 0;
 }
