@@ -11,6 +11,31 @@ const int ITERATION_EVERY = 10;
 
 const unsigned int RANDOM_SEED = 0;
 
+int processEvents()
+{
+    SDL_Event event;
+    int done = 0;
+
+    while (SDL_PollEvent(&event))
+    {
+        switch (event.type)
+        {
+        case SDL_WINDOWEVENT_CLOSE:
+            done = 1;
+            break;
+        case SDL_KEYDOWN:
+            if (event.key.keysym.sym == SDLK_ESCAPE)
+                done = 1;
+            break;
+        case SDL_QUIT:
+            done = 1;
+            break;
+        }
+    }
+
+    return done;
+}
+
 int main(void)
 {
     srand(RANDOM_SEED);
@@ -35,6 +60,8 @@ int main(void)
 
     for (int i = 0; i < MAX_ITERATION; i++)
     {
+        if (processEvents() != 0)
+            break;
 
         iterateAgents(agentArray, NUMBER_OF_AGENTS, traceMap, SCREEN_WIDTH, SCREEN_HEIGHT);
 
@@ -63,7 +90,8 @@ int main(void)
     freeAgents(agentArray);
 
     // Close and destroy the window
-    SDL_DestroyWindow(window);
+    if (window)
+        SDL_DestroyWindow(window);
     SDL_DestroyRenderer(renderer);
 
     // Clean up
