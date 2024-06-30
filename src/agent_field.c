@@ -60,12 +60,12 @@ void iterateAgents(struct Agent *agentArray, int agentNumber, char **traceMap, i
         float dx = cos(agentArray[i].angle);
         float dy = sin(agentArray[i].angle);
 
-        if (agentArray[i].x + dx >= boundX)
+        if (agentArray[i].x + dx < 0 || agentArray[i].x + dx >= boundX)
         {
             dx = -dx;
             agentArray[i].angle = acos(dx);
         }
-        else if (agentArray[i].y + dy >= boundY)
+        else if (agentArray[i].y + dy < 0 || agentArray[i].y + dy >= boundY)
         {
             dy = -dy;
             agentArray[i].angle = asin(dy);
