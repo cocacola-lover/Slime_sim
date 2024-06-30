@@ -6,6 +6,8 @@ const int NUMBER_OF_AGENTS = 10;
 
 int main(void)
 {
+    srand(0);
+
     char **traceMap = mallocTraceMap(640, 480);
     struct Agent *agentArray = mallocAgents(NUMBER_OF_AGENTS);
 
