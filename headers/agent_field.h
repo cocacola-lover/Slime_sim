@@ -7,4 +7,5 @@ struct Agent;
 void iterateAgents(struct Agent *agentArray, int agentNumber, char **traceMap, int boundX, int boundY);
 void drawTrace(struct Agent *agentPointer, char **traceMap);
 
-struct Agent *mallocAgent();
+struct Agent *mallocAgents(int numberOfAgents);
+void freeAgents(struct Agent *agentArray);

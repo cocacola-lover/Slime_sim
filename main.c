@@ -2,11 +2,12 @@
 #include <SDL2/SDL.h>
 #include "headers/agent_field.h"
 
+const int NUMBER_OF_AGENTS = 10;
+
 int main(void)
 {
-
     char **traceMap = mallocTraceMap(640, 480);
-    struct Agent *agentArray = mallocAgent();
+    struct Agent *agentArray = mallocAgents(NUMBER_OF_AGENTS);
 
     SDL_Window *window;     // Declare a window
     SDL_Renderer *renderer; // Declare a renderer
@@ -25,7 +26,7 @@ int main(void)
     for (int i = 0; i < 100; i++)
     {
 
-        iterateAgents(agentArray, 1, traceMap, 640, 480);
+        iterateAgents(agentArray, NUMBER_OF_AGENTS, traceMap, 640, 480);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
@@ -45,11 +46,11 @@ int main(void)
 
         SDL_RenderPresent(renderer);
 
-        SDL_Delay(1000);
+        SDL_Delay(100);
     }
 
     freeTraceMap(traceMap, 640);
-    free(agentArray);
+    freeAgents(agentArray);
 
     // Close and destroy the window
     SDL_DestroyWindow(window);

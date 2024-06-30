@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#define __USE_MISC
 #include <math.h>
 
 #include "../headers/agent_field.h"
@@ -31,14 +32,24 @@ struct Agent
     float angle; // angle describes the angle of movement
 };
 
-struct Agent *mallocAgent()
+struct Agent *mallocAgents(int numberOfAgents)
 {
-    struct Agent a = {1, 1, 1};
+    struct Agent *agentArray = malloc(numberOfAgents * sizeof(struct Agent));
 
-    struct Agent *agentArray = malloc(1 * sizeof(struct Agent));
-    agentArray[0] = a;
+    for (int i = 0; i < numberOfAgents; i++)
+    {
+        float angle = (float)rand() / (float)(RAND_MAX / (M_PI * 2));
+
+        struct Agent newAgent = {50, 50, angle};
+        agentArray[i] = newAgent;
+    }
 
     return agentArray;
+}
+
+void freeAgents(struct Agent *agentArray)
+{
+    free(agentArray);
 }
 
 void iterateAgents(struct Agent *agentArray, int agentNumber, char **traceMap, int boundX, int boundY)
