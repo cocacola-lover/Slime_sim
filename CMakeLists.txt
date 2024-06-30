@@ -11,4 +11,5 @@ add_executable(
     src/agent_field.c
 )
 target_link_libraries(Test ${SDL2_LIBRARIES})
+target_link_libraries(Test m)
 
