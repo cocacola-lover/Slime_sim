@@ -5,7 +5,7 @@
 
 #include "../headers/agent_field.h"
 
-const float FADING_COEF = 0.01;
+const float FADING_COEF = 0.005;
 
 // To avoid wasting time on memory allocation TraceMap simply switches frames
 void swapTraceMap(struct TraceMap *traceMap)
@@ -84,7 +84,21 @@ void fadeTrails(struct TraceMap *traceMap)
     for (int i = 0; i < traceMap->width; i++)
     {
         for (int j = 0; j < traceMap->height; j++)
-            traceMap->curMap[i][j] = fmax(traceMap->oldMap[i][j] - FADING_COEF, 0);
+        {
+            // Apply blur
+            float sum = 0;
+            float counter = 0;
+            for (int k = (i == 0 ? 0 : i - 1); k < (i == traceMap->width - 1 ? traceMap->width : i + 2); k++)
+            {
+                for (int l = (j == 0 ? 0 : j - 1); l < (j == traceMap->height - 1 ? traceMap->height : j + 2); l++)
+                {
+                    sum += traceMap->oldMap[k][l];
+                    counter += 1;
+                }
+            }
+
+            traceMap->curMap[i][j] = fmax(sum / counter - FADING_COEF, 0);
+        }
     }
 }
 
