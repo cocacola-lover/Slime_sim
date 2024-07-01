@@ -7,25 +7,50 @@
 
 const float FADING_COEF = 0.01;
 
-float **mallocTraceMap(int i, int j)
+// To avoid wasting time on memory allocation TraceMap simply switches frames
+void swapTraceMap(struct TraceMap *traceMap)
 {
-    float **traceMap = malloc(i * sizeof(float *));
+    float **t = traceMap->curMap;
+    traceMap->curMap = traceMap->oldMap;
+    traceMap->oldMap = t;
+}
 
-    for (int k = 0; k < i; k++)
+struct TraceMap mallocTraceMap(int width, int height)
+{
+    float **curMap = malloc(width * sizeof(float *));
+    float **oldMap = malloc(width * sizeof(float *));
+
+    for (int i = 0; i < width; i++)
     {
-        traceMap[k] = malloc(j * sizeof(float));
-        for (int l = 0; l < j; l++)
-            traceMap[k][l] = 0;
+        curMap[i] = malloc(height * sizeof(float));
+        oldMap[i] = malloc(height * sizeof(float));
+
+        for (int j = 0; j < height; j++)
+        {
+            curMap[i][j] = 0;
+            oldMap[i][j] = 0;
+        }
     }
+
+    struct TraceMap traceMap;
+    traceMap.oldMap = oldMap;
+    traceMap.curMap = curMap;
+    traceMap.width = width;
+    traceMap.height = height;
 
     return traceMap;
 }
 
-void freeTraceMap(float **traceMap, int i)
+void freeTraceMap(struct TraceMap traceMap)
 {
-    for (int k = 0; k < i; k++)
-        free(traceMap[k]);
-    free(traceMap);
+    for (int i = 0; i < traceMap.width; i++)
+    {
+        free(traceMap.oldMap[i]);
+        free(traceMap.curMap[i]);
+    }
+
+    free(traceMap.oldMap);
+    free(traceMap.curMap);
 }
 
 struct Agent
@@ -54,22 +79,21 @@ void freeAgents(struct Agent *agentArray)
     free(agentArray);
 }
 
-void fadeTrails(float **traceMap, int boundX, int boundY)
+void fadeTrails(struct TraceMap *traceMap)
 {
-    for (int i = 0; i < boundX; i++)
+    for (int i = 0; i < traceMap->width; i++)
     {
-        for (int j = 0; j < boundY; j++)
-            if (traceMap[i][j] > 0)
-                traceMap[i][j] = fmax(traceMap[i][j] - FADING_COEF, 0);
+        for (int j = 0; j < traceMap->height; j++)
+            traceMap->curMap[i][j] = fmax(traceMap->oldMap[i][j] - FADING_COEF, 0);
     }
 }
 
-void drawTrace(struct Agent *agentPointer, float **traceMap)
+void drawTrace(struct Agent *agentPointer, struct TraceMap *traceMap)
 {
-    traceMap[(int)roundf(agentPointer->x)][(int)roundf(agentPointer->y)] = 1;
+    traceMap->curMap[(int)roundf(agentPointer->x)][(int)roundf(agentPointer->y)] = 1;
 }
 
-void iterateAgents(struct Agent *agentArray, int agentNumber, float **traceMap, int boundX, int boundY)
+void iterateAgents(struct Agent *agentArray, int agentNumber, struct TraceMap *traceMap)
 {
     for (int i = 0; i < agentNumber; i++)
     {
@@ -77,12 +101,12 @@ void iterateAgents(struct Agent *agentArray, int agentNumber, float **traceMap, 
         float dy = sin(agentArray[i].angle);
 
         // Lessen bound by 0.5 so rounding in drawTrace does not round out of bounds
-        if (agentArray[i].x + dx < 0 || agentArray[i].x + dx >= boundX - 0.5)
+        if (agentArray[i].x + dx < 0 || agentArray[i].x + dx >= traceMap->width - 0.5)
         {
             dx = -dx;
             agentArray[i].angle = acos(dx);
         }
-        else if (agentArray[i].y + dy < 0 || agentArray[i].y + dy >= boundY - 0.5)
+        else if (agentArray[i].y + dy < 0 || agentArray[i].y + dy >= traceMap->height - 0.5)
         {
             dy = -dy;
             agentArray[i].angle = asin(dy);
@@ -95,8 +119,9 @@ void iterateAgents(struct Agent *agentArray, int agentNumber, float **traceMap, 
     }
 }
 
-void iterateSimulation(struct Agent *agentArray, int agentNumber, float **traceMap, int boundX, int boundY)
+void iterateSimulation(struct Agent *agentArray, int agentNumber, struct TraceMap *traceMap)
 {
-    fadeTrails(traceMap, boundX, boundY);
-    iterateAgents(agentArray, agentNumber, traceMap, boundX, boundY);
+    swapTraceMap(traceMap);
+    fadeTrails(traceMap);
+    iterateAgents(agentArray, agentNumber, traceMap);
 }

@@ -40,7 +40,7 @@ int main(void)
 {
     srand(RANDOM_SEED);
 
-    float **traceMap = mallocTraceMap(SCREEN_WIDTH, SCREEN_HEIGHT);
+    struct TraceMap traceMap = mallocTraceMap(SCREEN_WIDTH, SCREEN_HEIGHT);
     struct Agent *agentArray = mallocAgents(NUMBER_OF_AGENTS);
 
     SDL_Window *window;
@@ -64,7 +64,7 @@ int main(void)
         if (processEvents() != 0)
             break;
 
-        iterateSimulation(agentArray, NUMBER_OF_AGENTS, traceMap, SCREEN_WIDTH, SCREEN_HEIGHT);
+        iterateSimulation(agentArray, NUMBER_OF_AGENTS, &traceMap);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
@@ -76,7 +76,7 @@ int main(void)
         {
             for (int k = 0; k < SCREEN_HEIGHT; k++)
             {
-                char alpha = traceMap[j][k] * 255;
+                char alpha = traceMap.curMap[j][k] * 255;
                 SDL_SetRenderDrawColor(renderer, 112, 255, 219, alpha);
                 SDL_RenderDrawPoint(renderer, j, k);
             }
@@ -87,7 +87,7 @@ int main(void)
         SDL_Delay(ITERATION_EVERY);
     }
 
-    freeTraceMap(traceMap, SCREEN_WIDTH);
+    freeTraceMap(traceMap);
     freeAgents(agentArray);
 
     // Close and destroy the window
