@@ -6,7 +6,7 @@ const int SCREEN_WIDTH = 320;
 const int SCREEN_HEIGHT = 180;
 
 const int NUMBER_OF_AGENTS = 250;
-const int MAX_ITERATION = 1000;
+const int MAX_ITERATION = 10000;
 const int ITERATION_EVERY = 10;
 
 const unsigned int RANDOM_SEED = 0;
@@ -77,9 +77,9 @@ int main(void)
         {
             for (int k = 0; k < SCREEN_HEIGHT; k++)
             {
-                char alpha = traceMap.curMap[j][k] * 255;
-                SDL_SetRenderDrawColor(renderer, 112, 255, 219, alpha);
-                SDL_RenderDrawPoint(renderer, j, k);
+                char alpha = fmin(traceMap.curMap[j][k], 0.9) * 255;
+                SDL_SetRenderDrawColor(renderer, alpha, alpha, alpha, 255);
+                SDL_RenderDrawPoint(renderer, j, SCREEN_HEIGHT - 1 - k);
             }
         }
 
