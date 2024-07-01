@@ -5,7 +5,7 @@
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
 
-const int NUMBER_OF_AGENTS = 10;
+const int NUMBER_OF_AGENTS = 250;
 const int MAX_ITERATION = 1000;
 const int ITERATION_EVERY = 10;
 
@@ -40,7 +40,7 @@ int main(void)
 {
     srand(RANDOM_SEED);
 
-    char **traceMap = mallocTraceMap(SCREEN_WIDTH, SCREEN_HEIGHT);
+    float **traceMap = mallocTraceMap(SCREEN_WIDTH, SCREEN_HEIGHT);
     struct Agent *agentArray = mallocAgents(NUMBER_OF_AGENTS);
 
     SDL_Window *window;
@@ -57,13 +57,14 @@ int main(void)
         0                        // flags
     );
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
     for (int i = 0; i < MAX_ITERATION; i++)
     {
         if (processEvents() != 0)
             break;
 
-        iterateAgents(agentArray, NUMBER_OF_AGENTS, traceMap, SCREEN_WIDTH, SCREEN_HEIGHT);
+        iterateSimulation(agentArray, NUMBER_OF_AGENTS, traceMap, SCREEN_WIDTH, SCREEN_HEIGHT);
 
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
@@ -75,8 +76,8 @@ int main(void)
         {
             for (int k = 0; k < SCREEN_HEIGHT; k++)
             {
-                char alpha = traceMap[j][k];
-                SDL_SetRenderDrawColor(renderer, alpha, alpha, alpha, 255);
+                char alpha = traceMap[j][k] * 255;
+                SDL_SetRenderDrawColor(renderer, 112, 255, 219, alpha);
                 SDL_RenderDrawPoint(renderer, j, k);
             }
         }

@@ -5,13 +5,15 @@
 
 #include "../headers/agent_field.h"
 
-char **mallocTraceMap(int i, int j)
+const float FADING_COEF = 0.01;
+
+float **mallocTraceMap(int i, int j)
 {
-    char **traceMap = malloc(i * sizeof(char *));
+    float **traceMap = malloc(i * sizeof(float *));
 
     for (int k = 0; k < i; k++)
     {
-        traceMap[k] = malloc(j * sizeof(char));
+        traceMap[k] = malloc(j * sizeof(float));
         for (int l = 0; l < j; l++)
             traceMap[k][l] = 0;
     }
@@ -19,7 +21,7 @@ char **mallocTraceMap(int i, int j)
     return traceMap;
 }
 
-void freeTraceMap(char **traceMap, int i)
+void freeTraceMap(float **traceMap, int i)
 {
     for (int k = 0; k < i; k++)
         free(traceMap[k]);
@@ -52,11 +54,25 @@ void freeAgents(struct Agent *agentArray)
     free(agentArray);
 }
 
-void iterateAgents(struct Agent *agentArray, int agentNumber, char **traceMap, int boundX, int boundY)
+void fadeTrails(float **traceMap, int boundX, int boundY)
+{
+    for (int i = 0; i < boundX; i++)
+    {
+        for (int j = 0; j < boundY; j++)
+            if (traceMap[i][j] > 0)
+                traceMap[i][j] = fmax(traceMap[i][j] - FADING_COEF, 0);
+    }
+}
+
+void drawTrace(struct Agent *agentPointer, float **traceMap)
+{
+    traceMap[(int)roundf(agentPointer->x)][(int)roundf(agentPointer->y)] = 1;
+}
+
+void iterateAgents(struct Agent *agentArray, int agentNumber, float **traceMap, int boundX, int boundY)
 {
     for (int i = 0; i < agentNumber; i++)
     {
-
         float dx = cos(agentArray[i].angle);
         float dy = sin(agentArray[i].angle);
 
@@ -79,7 +95,8 @@ void iterateAgents(struct Agent *agentArray, int agentNumber, char **traceMap, i
     }
 }
 
-void drawTrace(struct Agent *agentPointer, char **traceMap)
+void iterateSimulation(struct Agent *agentArray, int agentNumber, float **traceMap, int boundX, int boundY)
 {
-    traceMap[(int)roundf(agentPointer->x)][(int)roundf(agentPointer->y)] = 255;
+    fadeTrails(traceMap, boundX, boundY);
+    iterateAgents(agentArray, agentNumber, traceMap, boundX, boundY);
 }

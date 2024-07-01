@@ -1,11 +1,11 @@
 #pragma once
 
-char **mallocTraceMap(int i, int j);
-void freeTraceMap(char **traceMap, int i);
+float **mallocTraceMap(int i, int j);
+void freeTraceMap(float **traceMap, int i);
 
 struct Agent;
-void iterateAgents(struct Agent *agentArray, int agentNumber, char **traceMap, int boundX, int boundY);
-void drawTrace(struct Agent *agentPointer, char **traceMap);
+void iterateAgents(struct Agent *agentArray, int agentNumber, float **traceMap, int boundX, int boundY);
+void iterateSimulation(struct Agent *agentArray, int agentNumber, float **traceMap, int boundX, int boundY);
 
 struct Agent *mallocAgents(int numberOfAgents);
 void freeAgents(struct Agent *agentArray);
