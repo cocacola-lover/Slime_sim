@@ -2,8 +2,8 @@
 #include <SDL2/SDL.h>
 #include "headers/agent_field.h"
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
+const int SCREEN_WIDTH = 320;
+const int SCREEN_HEIGHT = 180;
 
 const int NUMBER_OF_AGENTS = 250;
 const int MAX_ITERATION = 1000;
@@ -52,11 +52,12 @@ int main(void)
         "Slime Simulation",
         SDL_WINDOWPOS_UNDEFINED, // initial x position
         SDL_WINDOWPOS_UNDEFINED, // initial y position
-        SCREEN_WIDTH,            // width, in pixels
-        SCREEN_HEIGHT,           // height, in pixels
+        SCREEN_WIDTH * 4,        // width, in pixels
+        SCREEN_HEIGHT * 4,       // height, in pixels
         0                        // flags
     );
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    SDL_RenderSetScale(renderer, 4, 4);
     SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
 
     for (int i = 0; i < MAX_ITERATION; i++)
