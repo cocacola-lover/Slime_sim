@@ -6,6 +6,8 @@
 #include "../headers/agent_field.h"
 
 const float FADING_COEF = 0.005;
+// Cannot be more than M_PI / 2 and be less than 0
+const float MAX_RANDOM_NUDGE = M_PI / 4;
 
 // To avoid wasting time on memory allocation TraceMap simply switches frames
 void swapTraceMap(struct TraceMap *traceMap)
@@ -66,8 +68,9 @@ struct Agent *mallocAgents(int numberOfAgents)
     for (int i = 0; i < numberOfAgents; i++)
     {
         float angle = (float)rand() / (float)(RAND_MAX / (M_PI * 2));
+        // float angle = 1;
 
-        struct Agent newAgent = {50, 50, angle};
+        struct Agent newAgent = {160, 90, angle};
         agentArray[i] = newAgent;
     }
 
@@ -114,16 +117,38 @@ void iterateAgents(struct Agent *agentArray, int agentNumber, struct TraceMap *t
         float dx = cos(agentArray[i].angle);
         float dy = sin(agentArray[i].angle);
 
-        // Lessen bound by 0.5 so rounding in drawTrace does not round out of bounds
-        if (agentArray[i].x + dx < 0 || agentArray[i].x + dx >= traceMap->width - 0.5)
+        if (agentArray[i].x + dx < 0)
         {
-            dx = -dx;
-            agentArray[i].angle = acos(dx);
+            float randomNudge = (float)rand() / (float)(RAND_MAX / MAX_RANDOM_NUDGE);
+
+            agentArray[i].angle += (M_PI / 2 + randomNudge) * (dy >= 0 ? -1.0 : 1.0);
+            dx = cos(agentArray[i].angle);
+            dy = sin(agentArray[i].angle);
         }
-        else if (agentArray[i].y + dy < 0 || agentArray[i].y + dy >= traceMap->height - 0.5)
+        // Lessen bound by 0.5 so rounding in drawTrace does not round out of bounds
+        else if (agentArray[i].x + dx >= traceMap->width - 0.5)
         {
-            dy = -dy;
-            agentArray[i].angle = asin(dy);
+            float randomNudge = (float)rand() / (float)(RAND_MAX / MAX_RANDOM_NUDGE);
+
+            agentArray[i].angle += (M_PI / 2 + randomNudge) * (dy >= 0 ? 1.0 : -1.0);
+            dx = cos(agentArray[i].angle);
+            dy = sin(agentArray[i].angle);
+        }
+        else if (agentArray[i].y + dy < 0)
+        {
+            float randomNudge = (float)rand() / (float)(RAND_MAX / MAX_RANDOM_NUDGE);
+
+            agentArray[i].angle += (M_PI / 2 + randomNudge) * (dx >= 0 ? 1.0 : -1.0);
+            dx = cos(agentArray[i].angle);
+            dy = sin(agentArray[i].angle);
+        }
+        else if (agentArray[i].y + dy >= traceMap->height - 0.5)
+        {
+            float randomNudge = (float)rand() / (float)(RAND_MAX / MAX_RANDOM_NUDGE);
+
+            agentArray[i].angle += (M_PI / 2 + randomNudge) * (dx >= 0 ? -1.0 : 1.0);
+            dx = cos(agentArray[i].angle);
+            dy = sin(agentArray[i].angle);
         }
 
         drawTrace(&agentArray[i], traceMap);
