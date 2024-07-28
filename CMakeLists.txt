@@ -9,6 +9,7 @@ add_executable(
     Test 
     main.c 
     src/agent_field.c
+    src/trace_map.c
 )
 target_link_libraries(Test ${SDL2_LIBRARIES})
 target_link_libraries(Test m)
